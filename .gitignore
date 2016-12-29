@@ -1,7 +1,23 @@
-CMakeCache.txt
-CMakeFiles
-CMakeScripts
-Makefile
-cmake_install.cmake
-install_manifest.txt
-CTestTestfile.cmake
+# 编辑器的配置文件
+.vscode/
+# 这个文件有点用，不过这句话并没有产生期望的效果
+!c_cpp_properties.json
+# 也是编辑器的配置文件
+.idea/
+# 项目中曾经修改过导航包，后来又没有修改，而且这个包非常经典，很多设计手法需要认真学习和消化
+
+
+# 使用方法
+# 此为注释 – 将被 Git 忽略
+# 忽略所有 .a 结尾的文件
+# *.a
+# 但 lib.a 除外
+# !lib.a
+# 仅仅忽略项目根目录下的 TODO 文件，不包括 subdir/TODO
+# /TODO
+# 忽略 build/ 目录下的所有文件
+# build/
+# 会忽略 doc/notes.txt 但不包括 doc/server/arch.txt
+# doc/*.txt
+# ignore all .txt files in the doc/ directory
+# doc/**/*.txt
