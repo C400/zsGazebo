@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(amr_robots_description)
+project(zs_description)
 
 find_package(catkin REQUIRED COMPONENTS geometry_msgs sensor_msgs std_msgs robot_state_publisher urdf)
 
@@ -12,9 +12,7 @@ include_directories(
 )
 
 
-#install(DIRECTORY 
-#   launch defs meshes models
+# install(DIRECTORY 
+#   cad meshes urdf
 #   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 # )
-
-# TODO rule that generates plain XML URDF files from XACRO

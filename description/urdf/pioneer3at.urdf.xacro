@@ -1,33 +1,40 @@
 <?xml version="1.0"?>
+<!-- Revolute-Revolute Manipulator -->
+<!--this file include visual and geometry messages about p3at-->
+<robot name="pioneer3at" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-<robot xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
-       xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
-       xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
-       xmlns:xacro="http://ros.org/wiki/xacro"
-name="pioneer3at">
+	<!-- Constants for robot dimensions -->
+	<xacro:property name="PI" value="3.1415926535897931"/>
+	<xacro:property name="width" value="0.1" /> <!-- Square dimensions (widthxwidth) of beams -->
+	<xacro:property name="camera_link" value="0.05" /> <!-- Size of square 'camera' box -->
+	<xacro:property name="axel_offset" value="0.05" /> <!-- Space btw top of beam and the each joint -->
 
-<!-- Chassis -->
+	<!-- Import all Gazebo-customization elements, including Gazebo colors -->
+	<!--the file below include messages about Gazebo plugins for p3at-->
+	<xacro:include filename="$(find zs_description)/urdf/include/p3at_add/pioneer3at.xacro" />
+	<!-- Import Rviz colors -->
+	<xacro:include filename="$(find zs_description)/urdf/include/p3at_add/materials.xacro" />
+	
+	<!-- Import xacro:macro for wheels -->
+	<xacro:include filename="$(find zs_description)/urdf/include/p3at_add/pioneer3at_wheels.xacro" />
+	
+	<!-- Import xacro:macro for pilars -->
+	<xacro:include filename="$(find zs_description)/urdf/include/p3at_add/pioneer3at_pilars.xacro" />
+
+
+	<!-- Chassis -->
 	<link name="base_link">
-
-
-		<!--  For pointers on inertial and gazebo-related parameters see
-		       * http://wiki.ros.org/urdf/Tutorials/Adding%20Physical%20and%20Collision%20Properties%20to%20a%20URDF%20Model
-                       * http://answers.gazebosim.org/question/4372/the-inertia-matrix-explained/
-		       * http://gazebosim.org/tutorials?tut=inertia&cat=build_robot, and 
-                       * http://gazebosim.org/tutorials/?tut=ros_urdf
-                       * http://en.wikipedia.org/wiki/List_of_moment_of_inertia_tensors  
-                -->
 		<inertial>
-			<mass value="21.5"/> <!-- P3AT 18.6kg plus three batteries @ 2.4kg each  minus four wheels @ 1.4 kg ea and top plate @ 0.1 kg-->
-			<origin xyz="0 -0.1 0.177"/>
-			<inertia ixx="0.3338" ixy="0.0"     ixz="0.0"
-				              iyy="0.4783"  iyz="0.0"
-				                            izz="0.3338"/>
+			<mass value="10.0"/>
+			<origin xyz="0 0 0.177"/>
+			<inertia ixx="0.3338" ixy="0.0" ixz="0.0"
+				 iyy="0.4783" iyz="0.0"
+				 izz="0.3338"/>
 		</inertial>
 		<visual name="base_visual">
 			<origin xyz="0 0 0.177" rpy="0 0 0"/>
 			<geometry name="pioneer_geom">
-				<mesh filename="package://amr_robots_description/meshes/p3at_meshes/chassis.stl"/>
+				<mesh filename="package://zs_description/meshes/p3at/chassis.stl"/>
 			</geometry>
 			<material name="ChassisRed">
 				<color rgba="0.851 0.0 0.0 1.0"/>
@@ -36,15 +43,13 @@ name="pioneer3at">
 		<collision>
 			<origin xyz="0 0 0.177" rpy="0 0 0"/>
 				<geometry>
-					<mesh filename="package://amr_robots_description/meshes/p3at_meshes/chassis.stl"/>
+					<mesh filename="package://zs_description/meshes/p3at/chassis.stl"/>
 				</geometry>
 		</collision>
 	</link>
-	<gazebo reference="base_link">
-		<material value="Gazebo/Red"/>
-	</gazebo>
+	
 
-<!-- Top -->
+	<!-- Top -->
 	<link name="top_plate">
 		<inertial>
 			<mass value="0.1"/>	
@@ -53,10 +58,10 @@ name="pioneer3at">
 				 iyy="1.0" iyz="0.0"
  				izz="1.0"/>
 		</inertial>
-		<visual name="base_visual">
+		<visual name="top_visual">
 			<origin xyz="0 0 0" rpy="0 0 0"/>
 			<geometry name="pioneer_geom">
-				<mesh filename="package://amr_robots_description/meshes/p3at_meshes/top.stl"/>
+				<mesh filename="package://zs_description/meshes/p3at/top.stl"/>
 			</geometry>
 			<material name="TopBlack">
 					<color rgba="0.038 0.038 0.038 1.0"/>
@@ -69,30 +74,261 @@ name="pioneer3at">
 			</geometry>
 		</collision>
 	</link>
-	<gazebo reference="top_plate">
-    <material>Gazebo/Black</material>
-	</gazebo>
 
 	<joint name="base_top_joint" type="fixed">
 		<origin xyz="0.003 0 0.274" rpy="0 0 0"/>
 		<parent link="base_link"/>
 		<child link="top_plate"/>
 	</joint>
-<!-- Front + Back Sonar -->
-	<link name="front_sonar">
+	
+	
+	<!-- Long pilars -->
+	<xacro:longpilar_front suffix="left" reflect="1"/>
+	<xacro:longpilar_front suffix="right" reflect="-1"/>
+	
+	
+	<!-- Side_left -->
+	<link name="side_plate_left">
 		<inertial>
 			<mass value="0.1"/>	
 			<origin xyz="0 0 0"/>
 			<inertia ixx="1.0" ixy="0.0" ixz="0.0"
-				 iyy="1.0" iyz="0.0" izz="1.0"/>
+				 iyy="1.0" iyz="0.0"
+ 				izz="1.0"/>
 		</inertial>
-		<visual name="base_visual">
+		<visual name="side_visual">
+			<origin xyz="0 0 0" rpy="1.57079 0 0"/>
+			<geometry name="pioneer_geom">
+				<mesh filename="package://zs_description/meshes/lateral/lateral.stl"/>
+			</geometry>
+			<material name="ChassisRed">
+				<color rgba="0.8 0.0 0.0 1.0"/>
+			</material>
+		</visual>
+		<collision>
+			<origin xyz="0 0 0" rpy="1.57079 0 0"/>
+			<geometry>
+				<mesh filename="package://zs_description/meshes/lateral/lateral.stl"/>
+			</geometry>
+		</collision>
+	</link>
+
+	<joint name="base_sideleft_joint" type="fixed">
+		<origin xyz="-0.02 0.165 0.1" rpy="0 0 0"/>
+		<parent link="top_plate"/>
+		<child link="side_plate_left"/>
+	</joint>
+	
+	
+		<!-- Side_right -->
+	<link name="side_plate_right">
+		<inertial>
+			<mass value="0.1"/>	
+			<origin xyz="0 0 0"/>
+			<inertia ixx="1.0" ixy="0.0" ixz="0.0"
+				 iyy="1.0" iyz="0.0"
+ 				izz="1.0"/>
+		</inertial>
+		<visual name="side_visual">
+			<origin xyz="0 0 0" rpy="1.57079 0 0"/>
+			<geometry name="pioneer_geom">
+				<mesh filename="package://zs_description/meshes/lateral/lateral.stl"/>
+			</geometry>
+			<material name="ChassisRed">
+				<color rgba="0.8 0.0 0.0 1.0"/>
+			</material>
+		</visual>
+		<collision>
+			<origin xyz="0 0 0" rpy="1.57079 0 0"/>
+			<geometry>
+				<mesh filename="package://zs_description/meshes/lateral/lateral.stl"/>
+			</geometry>
+		</collision>
+	</link>
+
+	<joint name="base_sideright_joint" type="fixed">
+		<origin xyz="-0.02 -0.162 0.1" rpy="0 0 0"/>
+		<parent link="top_plate"/>
+		<child link="side_plate_right"/>
+	</joint>
+
+		<!-- Side_back_down_right -->
+	<link name="side_plate_back_down_right">
+		<inertial>
+			<mass value="0.1"/>	
+			<origin xyz="0 0 0"/>
+			<inertia ixx="1.0" ixy="0.0" ixz="0.0"
+				 iyy="1.0" iyz="0.0"
+ 				izz="1.0"/>
+		</inertial>
+		<visual name="side_visual">
 			<origin xyz="0 0 0" rpy="0 0 0"/>
 			<geometry name="pioneer_geom">
-				<mesh filename="package://amr_robots_description/meshes/p3at_meshes/front_sonar.stl"/>
+				<box size="0.15 0.003 0.11"/>
 			</geometry>
-			<material name="SonarYellow">
-				<color rgba="0.715 0.583 0.210 1.0"/>
+			<material name="ChassisRed">
+				<color rgba="0.8 0.0 0.0 1.0"/>
+			</material>
+		</visual>
+		<collision>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry>
+				<box size="0.15 0.003 0.11"/>
+			</geometry>
+		</collision>
+	</link>
+
+	<joint name="base_sidebackdownright_joint" type="fixed">
+		<origin xyz="-0.205 -0.095 0.055" rpy="0 0 -1.1"/>
+		<parent link="top_plate"/>
+		<child link="side_plate_back_down_right"/>
+	</joint>
+
+		<!-- Side_back_up_right -->
+	<link name="side_plate_back_up_right">
+		<inertial>
+			<mass value="0.1"/>	
+			<origin xyz="0 0 0"/>
+			<inertia ixx="1.0" ixy="0.0" ixz="0.0"
+				 iyy="1.0" iyz="0.0"
+ 				izz="1.0"/>
+		</inertial>
+		<visual name="side_visual">
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry name="pioneer_geom">
+				<box size="0.15 0.003 0.08"/>
+			</geometry>
+			<material name="ChassisRed">
+				<color rgba="0.8 0.0 0.0 1.0"/>
+			</material>
+		</visual>
+		<collision>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry>
+				<box size="0.15 0.003 0.08"/>
+			</geometry>
+		</collision>
+	</link>
+
+	<joint name="base_sidebackupright_joint" type="fixed">
+		<origin xyz="-0.205 -0.095 0.16" rpy="0 0 -1.1"/>
+		<parent link="top_plate"/>
+		<child link="side_plate_back_up_right"/>
+	</joint>
+
+		<!-- Side_back_down_left -->
+	<link name="side_plate_back_down_left">
+		<inertial>
+			<mass value="0.1"/>	
+			<origin xyz="0 0 0"/>
+			<inertia ixx="1.0" ixy="0.0" ixz="0.0"
+				 iyy="1.0" iyz="0.0"
+ 				izz="1.0"/>
+		</inertial>
+		<visual name="side_visual">
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry name="pioneer_geom">
+				<box size="0.15 0.003 0.11"/>
+			</geometry>
+			<material name="ChassisRed">
+				<color rgba="0.8 0.0 0.0 1.0"/>
+			</material>
+		</visual>
+		<collision>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry>
+				<box size="0.15 0.003 0.11"/>
+			</geometry>
+		</collision>
+	</link>
+
+	<joint name="base_sidebackdownleft_joint" type="fixed">
+		<origin xyz="-0.205 0.095 0.055" rpy="0 0 1.1"/>
+		<parent link="top_plate"/>
+		<child link="side_plate_back_down_left"/>
+	</joint>
+
+		<!-- Side_back_up_left -->
+	<link name="side_plate_back_up_left">
+		<inertial>
+			<mass value="0.1"/>	
+			<origin xyz="0 0 0"/>
+			<inertia ixx="1.0" ixy="0.0" ixz="0.0"
+				 iyy="1.0" iyz="0.0"
+ 				izz="1.0"/>
+		</inertial>
+		<visual name="side_visual">
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry name="pioneer_geom">
+				<box size="0.15 0.003 0.08"/>
+			</geometry>
+			<material name="ChassisRed">
+				<color rgba="0.8 0.0 0.0 1.0"/>
+			</material>
+		</visual>
+		<collision>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry>
+				<box size="0.15 0.003 0.08"/>
+			</geometry>
+		</collision>
+	</link>
+
+	<joint name="base_sidebackupleft_joint" type="fixed">
+		<origin xyz="-0.205 0.095 0.16" rpy="0 0 1.1"/>
+		<parent link="top_plate"/>
+		<child link="side_plate_back_up_left"/>
+	</joint>
+
+		<!-- Side_back_up -->
+	<link name="side_plate_back_up">
+		<inertial>
+			<mass value="0.1"/>	
+			<origin xyz="0 0 0"/>
+			<inertia ixx="1.0" ixy="0.0" ixz="0.0"
+				 iyy="1.0" iyz="0.0"
+ 				izz="1.0"/>
+		</inertial>
+		<visual name="side_visual">
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry name="pioneer_geom">
+				<box size="0.058 0.003 0.05"/>
+			</geometry>
+			<material name="ChassisRed">
+				<color rgba="0.8 0.0 0.0 1.0"/>
+			</material>
+		</visual>
+		<collision>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry>
+				<box size="0.058 0.003 0.05"/>
+			</geometry>
+		</collision>
+	</link>
+
+	<joint name="base_sidebackup_joint" type="fixed">
+		<origin xyz="-0.24 0. 0.175" rpy="0 0 1.57079"/>
+		<parent link="top_plate"/>
+		<child link="side_plate_back_up"/>
+	</joint>
+
+
+	<!-- Top top-->
+	<link name="toptop_plate">
+		<inertial>
+			<mass value="0.1"/>	
+			<origin xyz="0 0 0"/>
+			<inertia ixx="1.0" ixy="0.0" ixz="0.0"
+				 iyy="1.0" iyz="0.0"
+ 				izz="1.0"/>
+		</inertial>
+		<visual name="toptop_visual">
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry name="pioneer_geom">
+				<mesh filename="package://zs_description/meshes/lateral/toptop.stl"/>
+			</geometry>
+			<material name="TopBlack">
+					<color rgba="0.038 0.038 0.038 1.0"/>
 			</material>
 		</visual>
 		<collision>
@@ -102,323 +338,114 @@ name="pioneer3at">
 			</geometry>
 		</collision>
 	</link>
-	<gazebo reference="front_sonar">
-		<material value="Gazebo/Yellow"/>
-	</gazebo>
 
-	<joint name="base_front_joint" type="fixed">
-		<origin xyz="0.193 0 0.25" rpy="0 0 0"/>
-		<parent link="base_link"/>
-		<child link="front_sonar"/>
-	</joint>
-
-	<link name="back_sonar">
-		<inertial>
-			<mass value="0.1"/>	
-			<origin xyz="0 0 0"/>
-			<inertia ixx="1.0" ixy="0.0" ixz="0.0"
-				 iyy="1.0" iyz="0.0" izz="1.0"/>
-		</inertial>
-		<visual name="base_visual">
-			<origin xyz="0 0 0" rpy="0 0 0"/>
-			<geometry name="pioneer_geom">
-				<mesh filename="package://amr_robots_description/meshes/p3at_meshes/back_sonar.stl"/>
-			</geometry>
-			<material name="SonarYellow">
-				<color rgba="0.715 0.583 0.210 1.0"/>
-			</material>
-		</visual>
-		<collision>
-			<origin xyz="0 0 0" rpy="0 0 0"/>
-			<geometry>
-				<box size="0 0 0"/>
-			</geometry>
-		</collision>
-	</link>
-	<gazebo reference="back_sonar">
-		<material value="Gazebo/Yellow"/>
-	</gazebo>
-
-	<joint name="base_back_joint" type="fixed">
-		<origin xyz="-0.187 0 0.247" rpy="0 0 0"/>
-		<parent link="base_link"/>
-		<child link="back_sonar"/>
-	</joint>
-
-<xacro:macro name="p3at_drive_side" params="side reflect">
-
-  <!-- Front Axles + Wheels + Hubcaps -->
-	<link name="p3at_front_${side}_axle">
-		<inertial>
-			<mass value="0.1"/>	
-			<origin xyz="0 0 0"/>
-			<inertia ixx="1.0" ixy="0.0" ixz="0.0"
-				 iyy="1.0" iyz="0.0" izz="1.0"/>
-  	 	</inertial>
-	<visual name="base_visual">
-		<origin xyz="0 0 0" rpy="0 0 0"/>
-		<geometry name="pioneer_geom">
-			<mesh filename="package://amr_robots_description/meshes/p3at_meshes/axle.stl"/>
-		</geometry>
-		<material name="AxleGrey">
-			<color rgba="0.5 0.5 0.5 1"/>
-		</material>
-	</visual>
-	<collision>
-		<origin xyz="0 0 0" rpy="0 0 0"/>
-		<geometry>
-			<box size="0 0 0"/>
-		</geometry>
-	</collision>
-	</link>
-	<gazebo reference="p3at_front_${side}_axle">
-		<material value="Gazebo/Grey"/>
-	</gazebo>
-
-	<joint name="base_front_${side}_axle_joint" type="fixed">
-		<origin xyz="0.135 ${reflect*0.156} 0.111" rpy="0 0 0"/>
-		<parent link="base_link"/>
-		<child link="p3at_front_${side}_axle"/>
-	</joint>
-
-	<link name="p3at_front_${side}_hub">
-		<inertial>
-			<mass value="0.1"/>	
-			<origin xyz="0 0 0"/>
-			<inertia ixx="1.0" ixy="0.0" ixz="0.0"
-				 iyy="1.0" iyz="0.0" izz="1.0"/>
-  	 	</inertial>
-	<visual name="base_visual">
-		<origin xyz="0 0 0" rpy="0 0 0"/>
-		<geometry name="pioneer_geom">
-			<mesh filename="package://amr_robots_description/meshes/p3at_meshes/${side}_hubcap.stl"/>
-		</geometry>
-		<material name="HubcapYellow">
-			<color rgba="1.0 0.811 0.151 1.0"/>
-		</material>
-	</visual>
-	<collision>
-		<origin xyz="0 0 0" rpy="0 0 0"/>
-		<geometry>
-			<box size="0 0 0"/>
-		</geometry>
-	</collision>
-	</link>
-	<gazebo reference="p3at_front_${side}_hub">
-		<material value="Gazebo/Yellow"/>
-	</gazebo>
-
-	<joint name="base_front_${side}_hub_joint" type="fixed">
-		<origin xyz="0 ${reflect*0.041} 0" rpy="0 0 0"/>
-		<parent link="p3at_front_${side}_axle"/>
-		<child link="p3at_front_${side}_hub"/>
-	</joint>
-
-	<link name="p3at_front_${side}_wheel">
-		<inertial>
-			<mass value="1.2"/> <!-- 1.4 kg - axle 0.1 kg - hub 0.1 kg -->
-			<origin xyz="0 0 0"/>
-			<inertia ixx="0.012411765597" ixy="0" ixz="0"
-         iyy="0.015218160428" iyz="0" izz="0.011763977943"/>
-      </inertial>
-	<visual name="base_visual">
-		<origin xyz="0 0 0" rpy="0 0 0"/>
-		<geometry name="pioneer_geom">
-			<mesh filename="package://amr_robots_description/meshes/p3at_meshes/wheel.stl"/>
-		</geometry>
-		<material name="WheelBlack">
-			<color rgba="0.117 0.117 0.117 1"/>
-		</material>
-	</visual>
-	<collision>
-		<origin xyz="0 0 0" rpy="${-3.1415927/2} 0 0"/>
-		<geometry>
-	    <!--mesh filename="package://amr_robots_description/meshes/p3at_meshes/wheel.stl"/-->
-	    <cylinder radius="0.111" length="0.075"/>
-		</geometry>
-	</collision>
-	</link>
-	<gazebo reference="p3at_front_${side}_wheel">
-		<material value="Gazebo/Black"/>
-	</gazebo>
-
-	<joint name="p3at_front_${side}_wheel_joint" type="continuous">
-  	<axis xyz="0 1 0"/>
-    <anchor xyz="0 0 0"/>
-    <limit effort="100" velocity="100" />
-    <joint_properties damping="0.7"/>
-		<origin xyz="0 0 0" rpy="0 0 0"/>
-		<parent link="p3at_front_${side}_hub"/>
-		<child link="p3at_front_${side}_wheel"/>
-	</joint>
-
-<!-- Back Axles + Wheels + Hubcaps -->
-	<link name="p3at_back_${side}_axle">
-		<inertial>
-			<mass value="0.1"/>	
-			<origin xyz="0 0 0"/>
-			<inertia ixx="1.0" ixy="0.0" ixz="0.0"
-				 iyy="1.0" iyz="0.0" izz="1.0"/>
-  	 	</inertial>
-	<visual name="base_visual">
-		<origin xyz="0 0 0" rpy="0 0 0"/>
-		<geometry name="pioneer_geom">
-			<mesh filename="package://amr_robots_description/meshes/p3at_meshes/axle.stl"/>
-		</geometry>
-		<material name="AxleGrey">
-			<color rgba="0.5 0.5 0.5 1"/>
-		</material>
-	</visual>
-	<collision>
-		<origin xyz="0 0 0" rpy="0 0 0"/>
-		<geometry>
-			<mesh filename="package://amr_robots_description/meshes/p3at_meshes/axle.stl"/>
-		</geometry>
-	</collision>
-	</link>
-	<gazebo reference="p3at_back_${side}_axle">
-		<material value="Gazebo/Grey"/>
-	</gazebo>
-
-	<joint name="p3at_back_${side}_axle_joint" type="fixed">
-		<origin xyz="-0.134 ${reflect*0.156} 0.111" rpy="0 0 0"/>
-		<parent link="base_link"/>
-		<child link="p3at_back_${side}_axle"/>
-	</joint>
-
-
-	<link name="p3at_back_${side}_hub">
-		<inertial>
-			<mass value="0.1"/>	
-			<origin xyz="0 0 0"/>
-			<inertia ixx="1.0" ixy="0.0" ixz="0.0"
-				 iyy="1.0" iyz="0.0" izz="1.0"/>
-  	 	</inertial>
-	<visual name="base_visual">
-		<origin xyz="0 0 0" rpy="0 0 0"/>
-		<geometry name="pioneer_geom">
-			<mesh filename="package://amr_robots_description/meshes/p3at_meshes/${side}_hubcap.stl"/>
-		</geometry>
-		<material name="HubcapYellow"/>
-	</visual>
-	<collision>
-		<origin xyz="0 0 0" rpy="0 0 0"/>
-		<geometry>
-			<mesh filename="package://amr_robots_description/meshes/p3at_meshes/${side}_hubcap.stl"/>
-		</geometry>
-	</collision>
-	</link>
-	<gazebo reference="p3at_back_${side}_hub">
-		<material value="Gazebo/Yellow"/>
-	</gazebo>
-
-	<joint name="p3at_back_${side}_hub_joint" type="fixed">
-		<origin xyz="-0 ${reflect*0.041} 0" rpy="0 0 0"/>
-		<parent link="p3at_back_${side}_axle"/>
-		<child link="p3at_back_${side}_hub"/>
-	</joint>
-
-	<link name="p3at_back_${side}_wheel">
-		<inertial>
-			<mass value="1.2"/>	
-			<origin xyz="0 0 0"/>
-			<inertia ixx="0.012411765597" ixy="0" ixz="0"
-                                                      iyy="0.015218160428" iyz="0" 
-                                                                           izz="0.011763977943"/>
-      </inertial>
-	<visual name="base_visual">
-		<origin xyz="0 0 0" rpy="0 0 0"/>
-		<geometry name="pioneer_geom">
-			<mesh filename="package://amr_robots_description/meshes/p3at_meshes/wheel.stl"/>
-		</geometry>
-		<material name="WheelBlack"/>
-	</visual>
-	<collision>
-		<origin xyz="0 0 0" rpy="${-3.1415927/2} 0 0"/>
-		<geometry>
-	    <!--mesh filename="package://amr_robots_description/meshes/p3at_meshes/wheel.stl"/-->
-	    <cylinder radius="0.111" length="0.075"/>
-		</geometry>
-	</collision>
-	</link>
-	<gazebo reference="p3at_back_${side}_wheel">
-		<material value="Gazebo/Black"/>
-	</gazebo>
-
-	<joint name="p3at_back_${side}_wheel_joint" type="continuous">
-	  <axis xyz="0 1 0"/>
-    <anchor xyz="0 0 0"/>
-    <limit effort="100" velocity="100" />
-    <joint_properties damping="0.7"/>
-		<origin xyz="0 0 0" rpy="0 0 0"/>
-		<parent link="p3at_back_${side}_hub"/>
-		<child link="p3at_back_${side}_wheel"/>
+	<joint name="base_toptop_joint" type="fixed">
+		<origin xyz="0.003 0 0.2" rpy="0 0 0"/>
+		<parent link="top_plate"/>
+		<child link="toptop_plate"/>
 	</joint>
 	
 
-  <!-- see http://gazebosim.org/tutorials/?tut=ros_urdf -->
+	<!-- Sick Laser -->
+	<link name="laser">
+		<collision>
+			<origin xyz="0 0 -0.06" rpy="0 0 0"/>
+			<geometry>
+				<box size="0.1 0.1 0.16"/>
+			</geometry>
+		</collision>
 
-  <gazebo reference="p3at_back_${side}_wheel">
-    <kp>1000000.0</kp> <!-- kp and kd for rubber -->
-    <kd>100.0</kd>
-    <mu1>1.0</mu1> <!-- was 10 -->
-    <mu2>1.0</mu2>
-      <!-- how to get these into <surface><friction><ode>... ?
-        slip1 0.5 /slip1 
-         slip2 0 /slip2 
-      -->
-    <fdir1>0 1 0</fdir1> <!-- is this correct? -->
-    <maxVel>1.0</maxVel>
-    <minDepth>0.00</minDepth>
-    <material value="Gazebo/Black" />
-  </gazebo>
-  
-  <gazebo reference="p3at_front_${side}_wheel">
-    <kp>1000000.0</kp> <!-- kp and kd for rubber -->
-    <kd>100.0</kd>
-    <mu1>1.0</mu1> <!-- was 10 -->
-    <mu2>1.0</mu2>
-      <!-- how to get these into <surface><friction><ode>... ?
-        slip1 0.5 /slip1 
-         slip2 0 /slip2 
-      -->
-    <fdir1>0 1 0</fdir1> <!-- is this correct? -->
-    <maxVel>1.0</maxVel>
-    <minDepth>0.00</minDepth>
-    <material value="Gazebo/Black" />
-  </gazebo>
+		<visual>
+			<origin xyz="0 0 -0.05" rpy="3.141592 0 0"/>
+			<geometry>
+				<mesh filename="package://zs_description/meshes/sick_lms1xx/sick_lms100.dae"/>
+			</geometry>
+		</visual>
 
-</xacro:macro>
-
-
-<xacro:macro name="p3at_gazebo_ext">
-
-<gazebo>
-  <plugin name="skid_steer_drive_controller" filename="libgazebo_ros_skid_steer_drive.so">
-    <updateRate>100.0</updateRate>
-    <robotNamespace>sim_p3at</robotNamespace>
-    <leftFrontJoint>p3at_front_left_wheel_joint</leftFrontJoint>
-    <rightFrontJoint>p3at_front_right_wheel_joint</rightFrontJoint>
-    <leftRearJoint>p3at_back_left_wheel_joint</leftRearJoint>
-    <rightRearJoint>p3at_back_right_wheel_joint</rightRearJoint>
-    <wheelSeparation>0.4</wheelSeparation>
-    <wheelDiameter>0.215</wheelDiameter>
-    <robotBaseFrame>base_link</robotBaseFrame>
-    <MaxForce>5.0</MaxForce>
-    <torque>200</torque>
-    <commandTopic>cmd_vel</commandTopic>
-    <odometryTopic>odom</odometryTopic>
-    <odometryFrame>odom</odometryFrame>
-    <broadcastTF>1</broadcastTF>
-  </plugin>
-</gazebo>
+		<inertial>
+			<mass value="1e-5" />
+			<inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+		</inertial>
+	</link>
+	
+	<joint name="laser_joint" type="fixed">
+		<axis xyz="0 1 0" />
+		<origin xyz="-0.195 0 0.39" rpy="0 0 3.141592"/>
+		<parent link="base_link"/>
+		<child link="laser"/>
+	</joint>
+	
+	
+	<!-- Wheels, axes and hubs -->
+	<xacro:p3at_front suffix="left" reflect="1"/>
+	<xacro:p3at_front suffix="right" reflect="-1"/>
 
 
-</xacro:macro>
+	<!-- Camera -->
+	<link name="camera_link">
+		<collision>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry>
+				<box size="0.06 0.21 0.070"/>
+			</geometry>
+		</collision>
 
-<xacro:p3at_drive_side side="left" reflect="1"/>
-<xacro:p3at_drive_side side="right" reflect="-1"/>
-<xacro:p3at_gazebo_ext/>
+		<visual>
+			<origin xyz="0 0 -0.01" rpy="0 0 1.570796"/>
+			<geometry>
+				<mesh filename="package://zs_description/meshes/kinect/kinect.dae"/>
+			</geometry>
+		</visual>
 
+		<inertial>
+			<mass value="0.546" />
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<inertia ixx="0.003881243" ixy="0" ixz="0" iyy="0.000498940" iyz="0" izz="0.003879257" />
+		</inertial>
+	</link>
+	
+	<joint name="camera_joint" type="fixed">
+		<axis xyz="0 1 0" />
+		<origin xyz="0 0 0.10" rpy="0 0 0"/>
+		<parent link="top_plate"/>
+		<child link="camera_link"/>
+	</joint>
+
+<!-- camera config from turtlebot!! -->
+	<joint name="camera_rgb_joint" type="fixed">
+		<origin xyz="-0.087 -0.0125 0.2870" rpy="0 0 0"/>
+		<parent link="camera_link"/>
+		<child link="camera_rgb_frame"/>
+	</joint>
+	
+	<link name="camera_rgb_frame"/>
+
+	<joint name="camera_rgb_optical_joint" type="fixed">
+		<origin xyz="0 0 0" rpy="-1.570796 0 -1.570796" />
+		<parent link="camera_rgb_frame" />
+		<child link="camera_rgb_optical_frame" />
+	</joint>
+
+	<link name="camera_rgb_optical_frame"/>
+
+
+    <!-- The fixed joints & links below are usually published by static_transformers launched by the OpenNi launch 
+         files. However, for Gazebo simulation we need them, so we add them here.
+         (Hence, don't publish them additionally!) -->
+	<joint name="camera_depth_joint" type="fixed">
+		<origin xyz="0 -0.0250 0" rpy="0 0 0" />
+		<parent link="camera_link" />
+		<child link="camera_depth_frame" />
+	</joint>
+	
+	<link name="camera_depth_frame"/>
+
+	<joint name="camera_depth_optical_joint" type="fixed">
+		<origin xyz="0 0 0" rpy="-1.570796 0 -1.570796" />
+		<parent link="camera_depth_frame" />
+		<child link="camera_depth_optical_frame" />
+	</joint>
+	
+	<link name="camera_depth_optical_frame"/>
 
 </robot>
