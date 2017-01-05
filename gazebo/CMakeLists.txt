@@ -25,6 +25,7 @@ find_package(catkin REQUIRED COMPONENTS
   diagnostic_updater
   camera_info_manager
   std_msgs
+  gazebo_ros
 )
 
 include (FindPkgConfig)
@@ -64,6 +65,8 @@ include_directories(include
   ${OGRE_INCLUDE_DIRS}
   ${OGRE-Terrain_INCLUDE_DIRS}
   ${OGRE-Paging_INCLUDE_DIRS}
+  ${GAZEBO_INCLUDE_DIRS}
+  ${SDFormat_INCLUDE_DIRS}
 )
 
 link_directories(
@@ -140,6 +143,7 @@ catkin_package(
   DEPENDS 
     gazebo 
     SDF
+    gazebo_ros
   )
 #add_dependencies(${PROJECT_NAME}_gencfg ${catkin_EXPORTED_TARGETS})
 
