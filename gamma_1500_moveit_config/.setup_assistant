@@ -1,0 +1,10 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: cyton_gamma_1500_description
+    relative_path: cyton_gamma_1500.urdf
+  SRDF:
+    relative_path: config/cyton_gamma_1500.srdf
+  CONFIG:
+    author_name: zhensheng
+    author_email: zhensheng@outlook.com
+    generated_timestamp: 1484067487
