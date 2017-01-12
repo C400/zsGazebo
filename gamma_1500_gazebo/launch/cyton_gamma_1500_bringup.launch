@@ -1,0 +1,17 @@
+<launch>
+
+
+  <!-- Launch Gazebo  -->
+  <include file="$(find gamma_1500_gazebo)/launch/cyton_gamma_1500_world.launch" />   
+
+  <!-- ros_control seven dof arm launch file -->
+  <include file="$(find gamma_1500_gazebo)/launch/cyton_gamma_1500_gazebo_states.launch" />   
+
+  <!-- ros_control position control dof arm launch file -->
+  <!--<include file="$(find gamma_1500_gazebo)/launch/cyton_gamma_1500_gazebo_position.launch" />  -->
+
+  <!-- ros_control trajectory control dof arm launch file -->
+  <include file="$(find gamma_1500_gazebo)/launch/cyton_gamma_1500_trajectory_controller.launch" />    
+
+
+</launch>

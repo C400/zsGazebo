@@ -1,0 +1,7 @@
+<launch>
+	<rosparam file="$(find gamma_1500_gazebo)/config/trajectory_control.yaml" command="load"/>
+
+  <node name="cyton_gamma_1500_controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
+    output="screen" ns="/cyton_gamma_1500_arm" args="cyton_gamma_1500_joint_controller 						      gripper_controller"/>
+
+</launch>
