@@ -8,4 +8,5 @@
 sudo apt install ros-kinetic-moveit
 sudo apt install ros-kinetic-ros-control
 sudo apt install ros-kinetic-gazebo-ros-control
+sudo apt install ros-kinetic-moveit-visual-tools
 ```

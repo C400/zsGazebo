@@ -56,7 +56,7 @@
 #include <visualization_msgs/Marker.h>
 #include <visualization_msgs/MarkerArray.h>
 
-// Grasp 
+// Grasp
 #include <moveit_simple_grasps/simple_grasps.h>
 #include <moveit_simple_grasps/grasp_filter.h>
 #include <moveit_visual_tools/moveit_visual_tools.h>
@@ -107,7 +107,7 @@ private:
 public:
 
   // Constructor
-  GraspGeneratorTest(int num_tests) 
+  GraspGeneratorTest(int num_tests)
     : nh_("~")
   {
     // Get arm info from param server
@@ -126,21 +126,22 @@ public:
 
     // ---------------------------------------------------------------------------------------------
     // Load planning scene to share
-    planning_scene_monitor_.reset(new planning_scene_monitor::PlanningSceneMonitor("robot_description"));    
+    planning_scene_monitor_.reset(new planning_scene_monitor::PlanningSceneMonitor("robot_description"));
 
     // ---------------------------------------------------------------------------------------------
     // Load the Robot Viz Tools for publishing to Rviz
+    const robot_model::JointModelGroup* ee_jmg = planning_scene_monitor_->getRobotModel()->getJointModelGroup(grasp_data_.ee_group_);
+
     visual_tools_.reset(new moveit_visual_tools::MoveItVisualTools(grasp_data_.base_link_, "/end_effector_marker", planning_scene_monitor_));
     visual_tools_->setLifetime(40.0);
-    visual_tools_->setMuted(false);
-    visual_tools_->loadEEMarker(grasp_data_.ee_group_, planning_group_name_);
+    visual_tools_->loadEEMarker(ee_jmg);
     visual_tools_->setFloorToBaseHeight(-0.9);
 
     // Clear out old collision objects just because
     //visual_tools_->removeAllCollisionObjects();
 
     // Create a collision table for fun
-    visual_tools_->publishCollisionTable(TABLE_X, TABLE_Y, 0, TABLE_WIDTH, TABLE_HEIGHT, TABLE_DEPTH, "table");
+    visual_tools_->publishCollisionTable(TABLE_X, TABLE_Y, 0, 0, TABLE_WIDTH, TABLE_HEIGHT, TABLE_DEPTH, "table");
 
     // ---------------------------------------------------------------------------------------------
     // Load grasp generator
@@ -169,7 +170,7 @@ public:
         generateRandomObject(object_pose);
 
       // Show the block
-      visual_tools_->publishBlock(object_pose, rviz_visual_tools::BLUE, BLOCK_SIZE);
+      visual_tools_->publishCuboid(object_pose, BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE, rviz_visual_tools::BLUE);
 
       possible_grasps.clear();
       ik_solutions.clear();
@@ -182,8 +183,9 @@ public:
       grasp_filter_->filterGrasps(possible_grasps, ik_solutions, filter_pregrasps, grasp_data_.ee_parent_link_, planning_group_name_);
 
       // Visualize them
-      visual_tools_->publishAnimatedGrasps(possible_grasps, grasp_data_.ee_parent_link_);      
-      visual_tools_->publishIKSolutions(ik_solutions, planning_group_name_, 0.25);
+      visual_tools_->publishAnimatedGrasps(possible_grasps, ee_jmg);
+      const robot_model::JointModelGroup* arm_jmg = planning_scene_monitor_->getRobotModel()->getJointModelGroup(planning_group_name_);
+      visual_tools_->publishIKSolutions(ik_solutions, arm_jmg, 0.25);
 
       // Make sure ros is still going
       if(!ros::ok())
@@ -232,7 +234,7 @@ public:
     object_pose.position.x = visual_tools_->dRand(0.7,TABLE_DEPTH);
     object_pose.position.y = visual_tools_->dRand(-TABLE_WIDTH/2,-0.1);
     object_pose.position.z = TABLE_Z + TABLE_HEIGHT / 2.0 + BLOCK_SIZE / 2.0;
-  
+
     // Orientation
     double angle = M_PI * visual_tools_->dRand(0.1,1);
     Eigen::Quaterniond quat(Eigen::AngleAxis<double>(double(angle), Eigen::Vector3d::UnitZ()));
@@ -270,7 +272,7 @@ int main(int argc, char *argv[])
       }
     }
   }
-  
+
   // Seed random
   srand(ros::Time::now().toSec());
 
